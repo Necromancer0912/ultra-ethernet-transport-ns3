@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ultra Ethernet Transport (UET) — NS-3 Simulator Dashboard</title>
+  <meta name="description" content="Ultra Ethernet Transport Protocol Simulator — AI Base, AI Full, and HPC Profile Demonstrations with real SES/PDS packet visualization"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="styles.css"/>
+</head>
+<body>
+
+<!-- ═══════════════════════════ ANIMATED BACKGROUND ═══════════════════════════ -->
+<div class="bg-grid" aria-hidden="true"></div>
+<div class="bg-glow glow-1" aria-hidden="true"></div>
+<div class="bg-glow glow-2" aria-hidden="true"></div>
+<div class="bg-glow glow-3" aria-hidden="true"></div>
+
+<!-- ═══════════════════════════ NAVIGATION ════════════════════════════════════ -->
+<nav id="main-nav" role="navigation" aria-label="Main navigation">
+  <div class="nav-inner">
+    <div class="nav-brand">
+      <div class="logo-badge">UET</div>
+      <div class="nav-title-group">
+        <span class="nav-title">Ultra Ethernet Transport</span>
+        <span class="nav-sub">NS-3 Simulator · v1.0.2</span>
+      </div>
+    </div>
+    <ul class="nav-links" role="list">
+      <li><a href="#hero" class="nav-link active">Overview</a></li>
+      <li><a href="#profiles" class="nav-link">Profiles</a></li>
+      <li><a href="#protocol" class="nav-link">Protocol Stack</a></li>
+      <li><a href="#simulator" class="nav-link">Simulator</a></li>
+      <li><a href="#packets" class="nav-link">Packet Inspector</a></li>
+      <li><a href="#results" class="nav-link">Results</a></li>
+    </ul>
+    <div class="spec-badge">UE-Spec 1.0.2</div>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════ HERO SECTION ══════════════════════════════════ -->
+<section id="hero" class="hero" aria-label="Hero section">
+  <div class="hero-content">
+    <div class="hero-tag animate-in">
+      <span class="tag-dot"></span>
+      Ultra Ethernet Consortium · NS-3 Research Implementation
+    </div>
+    <h1 class="hero-title animate-in delay-1">
+      Ultra Ethernet<br/>
+      <span class="gradient-text">Transport Simulator</span>
+    </h1>
+    <p class="hero-desc animate-in delay-2">
+      A spec-complete NS-3 implementation of the UET SES/PDS protocol stack.
+      Demonstrates all three UET profiles — <strong>AI Base</strong>, <strong>AI Full</strong>, and <strong>HPC</strong> —
+      with realistic AI/HPC workloads including AllReduce, tensor-parallel KV cache exchange,
+      MPI collectives, and SHMEM one-sided communication.
+    </p>
+    <div class="hero-actions animate-in delay-3">
+      <button class="btn btn-primary" id="btn-run-all" onclick="runSimulation('all')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        Run All Scenarios
+      </button>
+      <button class="btn btn-ghost" onclick="document.getElementById('simulator').scrollIntoView({behavior:'smooth'})">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+        Custom Simulation
+      </button>
+    </div>
+    <div class="hero-stats animate-in delay-4">
+      <div class="hero-stat">
+        <span class="stat-val">4</span>
+        <span class="stat-lbl">Delivery Modes</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="hero-stat">
+        <span class="stat-val">18</span>
+        <span class="stat-lbl">NACK Codes</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="hero-stat">
+        <span class="stat-val">7</span>
+        <span class="stat-lbl">SES Formats</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="hero-stat">
+        <span class="stat-val">12</span>
+        <span class="stat-lbl">PDS Types</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Protocol Stack Diagram -->
+  <div class="hero-diagram animate-in delay-2" aria-label="UET Protocol Stack Diagram">
+    <div class="stack-diagram">
+      <div class="stack-header">UET Protocol Stack</div>
+      <div class="stack-layer layer-app">
+        <div class="layer-label">Application</div>
+        <div class="layer-tags">
+          <span class="layer-tag tag-blue">AI Training</span>
+          <span class="layer-tag tag-purple">HPC/MPI</span>
+          <span class="layer-tag tag-cyan">Inference</span>
+        </div>
+      </div>
+      <div class="stack-arrow">↓</div>
+      <div class="stack-layer layer-ses">
+        <div class="layer-label">SES — §3.4</div>
+        <div class="layer-sub">Serialized Endpoint Service</div>
+        <div class="layer-tags">
+          <span class="layer-tag tag-green">WRITE</span>
+          <span class="layer-tag tag-green">READ</span>
+          <span class="layer-tag tag-green">TAGGED</span>
+          <span class="layer-tag tag-green">ATOMIC</span>
+        </div>
+      </div>
+      <div class="stack-arrow">↓</div>
+      <div class="stack-layer layer-pds">
+        <div class="layer-label">PDS — §3.5</div>
+        <div class="layer-sub">Packet Delivery Service</div>
+        <div class="layer-tags">
+          <span class="layer-tag tag-yellow">RUD</span>
+          <span class="layer-tag tag-yellow">ROD</span>
+          <span class="layer-tag tag-yellow">RUDI</span>
+          <span class="layer-tag tag-yellow">UUD</span>
+        </div>
+      </div>
+      <div class="stack-arrow">↓</div>
+      <div class="stack-layer layer-pdc">
+        <div class="layer-label">PDC — §3.5.8</div>
+        <div class="layer-sub">Packet Delivery Context</div>
+        <div class="layer-tags">
+          <span class="layer-tag tag-orange">SYN</span>
+          <span class="layer-tag tag-orange">PSN</span>
+          <span class="layer-tag tag-orange">SACK</span>
+          <span class="layer-tag tag-orange">CLEAR</span>
+        </div>
+      </div>
+      <div class="stack-arrow">↓</div>
+      <div class="stack-layer layer-fabric">
+        <div class="layer-label">Fabric — 200Gbps+</div>
+        <div class="layer-sub">Ultra Ethernet Network</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════ PROFILES SECTION ══════════════════════════════ -->
+<section id="profiles" class="section" aria-labelledby="profiles-heading">
+  <div class="section-inner">
+    <div class="section-header">
+      <div class="section-tag">Spec §2.2.2 — Table 2-4/2-5</div>
+      <h2 id="profiles-heading" class="section-title">UET Transport Profiles</h2>
+      <p class="section-desc">Three profiles define minimum required capabilities. Each maps to distinct AI/HPC use cases.</p>
+    </div>
+
+    <div class="profiles-grid">
+      <!-- AI Base -->
+      <div class="profile-card profile-base" id="profile-aibase" tabindex="0" role="button" aria-pressed="false" onclick="selectProfile('aibase')">
+        <div class="profile-badge">0</div>
+        <div class="profile-icon">🤖</div>
+        <h3 class="profile-name">AI Base</h3>
+        <div class="profile-priority">Priority Level 0</div>
+        <p class="profile-desc">Lowest cost, fundamental AI workloads. Supports CCL collectives (AllReduce, AllGather) and basic RDMA operations.</p>
+        <ul class="profile-features" role="list">
+          <li class="feat yes">RDMA WRITE / READ</li>
+          <li class="feat yes">RUD + ROD + RUDI + UUD</li>
+          <li class="feat yes">CCL (AllReduce, AllGather)</li>
+          <li class="feat yes">PDC SYN + SACK bitmap</li>
+          <li class="feat yes">FI_HMEM (GPU memory)</li>
+          <li class="feat no">FI_TAGGED send/recv</li>
+          <li class="feat no">FI_ATOMIC operations</li>
+          <li class="feat no">Deferrable send</li>
+          <li class="feat no">SHMEM / MPI</li>
+        </ul>
+        <div class="profile-usecases">
+          <div class="usecase-badge">AllReduce</div>
+          <div class="usecase-badge">Gradients</div>
+          <div class="usecase-badge">Broadcast</div>
+        </div>
+        <button class="profile-run-btn" onclick="runSimulation('aibase'); event.stopPropagation()">
+          Run AI Base Demo
+        </button>
+      </div>
+
+      <!-- AI Full -->
+      <div class="profile-card profile-full featured" id="profile-aifull" tabindex="0" role="button" aria-pressed="false" onclick="selectProfile('aifull')">
+        <div class="featured-badge">FEATURED</div>
+        <div class="profile-badge">1</div>
+        <div class="profile-icon">🧠</div>
+        <h3 class="profile-name">AI Full</h3>
+        <div class="profile-priority">Priority Level 1</div>
+        <p class="profile-desc">Complete AI feature set. Adds tagged-send rendezvous, deferrable sends for pipeline bubbles, and fetching atomics.</p>
+        <ul class="profile-features" role="list">
+          <li class="feat yes">All AI Base features</li>
+          <li class="feat yes">FI_TAGGED (exact + wildcard)</li>
+          <li class="feat yes">FI_ATOMIC (fetch + non-fetch)</li>
+          <li class="feat yes">Deferrable Send</li>
+          <li class="feat yes">SHMEM put/get</li>
+          <li class="feat yes">FI_DIRECTED_RECV</li>
+          <li class="feat yes">Rendezvous protocol</li>
+          <li class="feat no">MPI collectives</li>
+        </ul>
+        <div class="profile-usecases">
+          <div class="usecase-badge">KV Cache</div>
+          <div class="usecase-badge">Pipeline Parallel</div>
+          <div class="usecase-badge">Tensor Parallel</div>
+        </div>
+        <button class="profile-run-btn" onclick="runSimulation('aifull'); event.stopPropagation()">
+          Run AI Full Demo
+        </button>
+      </div>
+
+      <!-- HPC -->
+      <div class="profile-card profile-hpc" id="profile-hpc" tabindex="0" role="button" aria-pressed="false" onclick="selectProfile('hpc')">
+        <div class="profile-badge">2</div>
+        <div class="profile-icon">⚡</div>
+        <h3 class="profile-name">HPC</h3>
+        <div class="profile-priority">Priority Level 2</div>
+        <p class="profile-desc">High Performance Computing. All AI Full features except deferrable send, plus MPI collectives and SHMEM symmetric heaps.</p>
+        <ul class="profile-features" role="list">
+          <li class="feat yes">All AI Full features</li>
+          <li class="feat yes">MPI_Allreduce / Scatter</li>
+          <li class="feat yes">SHMEM symmetric heaps</li>
+          <li class="feat yes">Non-fetching atomics</li>
+          <li class="feat yes">ROD ordered delivery</li>
+          <li class="feat yes">Halo exchange</li>
+          <li class="feat no">Deferrable send</li>
+        </ul>
+        <div class="profile-usecases">
+          <div class="usecase-badge">MPI Collectives</div>
+          <div class="usecase-badge">Halo Exchange</div>
+          <div class="usecase-badge">SHMEM PUT/GET</div>
+        </div>
+        <button class="profile-run-btn" onclick="runSimulation('hpc'); event.stopPropagation()">
+          Run HPC Demo
+        </button>
+      </div>
+    </div>
+
+    <!-- Interoperability note -->
+    <div class="interop-note">
+      <div class="interop-icon">ℹ️</div>
+      <div>
+        <strong>Profile Interoperability (§2.2.2.1):</strong>
+        AI Base is a subset of both AI Full and HPC. AI Full and HPC can interoperate if:
+        operations are limited to AI Full capabilities, and HPC treats deferrable_send as regular send.
+        Highest common priority profile is selected automatically by FEP capability negotiation.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════ PROTOCOL STACK SECTION ════════════════════════ -->
+<section id="protocol" class="section section-dark" aria-labelledby="protocol-heading">
+  <div class="section-inner">
+    <div class="section-header">
+      <div class="section-tag">UE-Specification-1.0.2 §3.4 + §3.5</div>
+      <h2 id="protocol-heading" class="section-title">Protocol Implementation</h2>
+      <p class="section-desc">Complete SES/PDS/PDC stack implemented in NS-3 with full spec compliance.</p>
+    </div>
+
+    <!-- Spec coverage table -->
+    <div class="spec-table-wrap">
+      <table class="spec-table" role="grid" aria-label="Spec coverage table">
+        <thead>
+          <tr>
+            <th scope="col">Section</th>
+            <th scope="col">Feature</th>
+            <th scope="col">Status</th>
+            <th scope="col">Implementation</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>§3.4.2</td><td>SES Header Formats (7 types)</td><td><span class="status done">✅ Complete</span></td><td><code>uet-ses-header.h/cc</code></td></tr>
+          <tr><td>§3.5.3</td><td>Delivery Modes (RUD/ROD/RUDI/UUD)</td><td><span class="status done">✅ Complete</span></td><td><code>uet-pds-header.h</code></td></tr>
+          <tr><td>§3.5.8</td><td>PDC Establishment (SYN handshake)</td><td><span class="status done">✅ Complete</span></td><td><code>uet-pdc.h/cc</code></td></tr>
+          <tr><td>§3.5.9</td><td>PDC Manager (alloc/free/msgmap)</td><td><span class="status done">✅ Complete</span></td><td><code>UetPdcManager</code></td></tr>
+          <tr><td>§3.5.10</td><td>PDS Wire Formats (12 types)</td><td><span class="status done">✅ Complete</span></td><td><code>uet-pds-header.h/cc</code></td></tr>
+          <tr><td>§3.5.11</td><td>PSN Spaces (CACK/CLEAR/SACK)</td><td><span class="status done">✅ Complete</span></td><td><code>PdcPsnSpace</code></td></tr>
+          <tr><td>§3.5.12</td><td>NACK Processing (18 codes)</td><td><span class="status done">✅ Complete</span></td><td><code>HandleRxNack()</code></td></tr>
+          <tr><td>§3.5.16</td><td>Control Packets (NOOP/CLEAR/ACK_REQ/CLOSE)</td><td><span class="status done">✅ Complete</span></td><td><code>UetPdsControlPacket</code></td></tr>
+          <tr><td>§2.2.2</td><td>AI Base Profile</td><td><span class="status done">✅ Complete</span></td><td><code>uet-hpc-ai-profiles.cc</code></td></tr>
+          <tr><td>§2.2.2</td><td>AI Full Profile (tagged/atomic/defer)</td><td><span class="status done">✅ Complete</span></td><td><code>uet-hpc-ai-profiles.cc</code></td></tr>
+          <tr><td>§2.2.2</td><td>HPC Profile (MPI/SHMEM/atomic)</td><td><span class="status done">✅ Complete</span></td><td><code>uet-hpc-ai-profiles.cc</code></td></tr>
+          <tr><td>§3.5.14</td><td>RDMA HW Integration (TX/RX path)</td><td><span class="status done">✅ Complete</span></td><td><code>rdma-hw-uet-integration.cc</code></td></tr>
+          <tr><td>§3.5.8.3</td><td>PDC Close Protocol</td><td><span class="status done">✅ Complete</span></td><td><code>InitiateClose()</code></td></tr>
+          <tr><td>§2.2.5.4.4</td><td>FI_ATOMIC (non-fetching)</td><td><span class="status done">✅ Complete</span></td><td><code>UET_ATOMIC opcode</code></td></tr>
+          <tr><td>§2.2.5.4.1.2</td><td>Deferrable Send (AI Full)</td><td><span class="status partial">🔶 Modeled</span></td><td>TC0 best-effort pathway</td></tr>
+          <tr><td>§3.3.7</td><td>CMS Congestion Control</td><td><span class="status partial">🔶 Framework</span></td><td>NACK-based feedback loop</td></tr>
+          <tr><td>§1.4.1</td><td>libfabric API Integration</td><td><span class="status partial">🔶 NS-3 mapped</span></td><td>UetSesPdsEngine API</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- PSN Space diagram -->
+    <div class="psn-section">
+      <h3 class="subsection-title">PSN Space Mechanics — §3.5.11.4</h3>
+      <div class="psn-diagram" aria-label="PSN space diagram">
+        <div class="psn-track">
+          <div class="psn-region psn-cleared" style="width:25%">
+            <span class="psn-label">Cleared<br/>[CLEAR_PSN]</span>
+          </div>
+          <div class="psn-region psn-acked" style="width:20%">
+            <span class="psn-label">ACKed<br/>[CACK_PSN]</span>
+          </div>
+          <div class="psn-region psn-inflight" style="width:30%">
+            <span class="psn-label">In-Flight (outstanding)<br/>MP_RANGE = 1024</span>
+          </div>
+          <div class="psn-region psn-window" style="width:25%">
+            <span class="psn-label">Tx Window<br/>[next_tx_psn]</span>
+          </div>
+        </div>
+        <div class="psn-markers">
+          <div style="left:25%" class="psn-marker">CLEAR_PSN</div>
+          <div style="left:45%" class="psn-marker">CACK_PSN</div>
+          <div style="left:75%" class="psn-marker">next_tx_PSN</div>
+        </div>
+        <div class="psn-legend">
+          <div class="legend-item"><span class="legend-dot cleared"></span> Guaranteed-delivery responses freed</div>
+          <div class="legend-item"><span class="legend-dot acked"></span> Cumulative ACK received</div>
+          <div class="legend-item"><span class="legend-dot inflight"></span> Outstanding, awaiting ACK</div>
+          <div class="legend-item"><span class="legend-dot window"></span> Available TX window</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════ SIMULATOR SECTION ═════════════════════════════ -->
+<section id="simulator" class="section" aria-labelledby="simulator-heading">
+  <div class="section-inner">
+    <div class="section-header">
+      <div class="section-tag">NS-3 Simulation Engine</div>
+      <h2 id="simulator-heading" class="section-title">Run Simulation</h2>
+      <p class="section-desc">Configure and launch UET simulations. Results update in real-time.</p>
+    </div>
+
+    <div class="sim-layout">
+      <!-- Control panel -->
+      <div class="sim-controls glass-card">
+        <h3 class="card-title">Simulation Configuration</h3>
+
+        <div class="form-group">
+          <label class="form-label" for="sel-scenario">Scenario</label>
+          <select id="sel-scenario" class="form-select">
+            <option value="all">All Scenarios (AI Base + AI Full + HPC)</option>
+            <option value="aibase">AI Base — CCL AllReduce</option>
+            <option value="aifull">AI Full — Tagged-Send + Atomics</option>
+            <option value="hpc">HPC — MPI_Allreduce + SHMEM</option>
+            <option value="complete">Complete Demo (SES/PDS/PDC full stack)</option>
+            <option value="network">Network Stress Test (200Gbps)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="sel-mode">Delivery Mode</label>
+          <select id="sel-mode" class="form-select">
+            <option value="RUD">RUD — Reliable Unordered Delivery</option>
+            <option value="ROD">ROD — Reliable Ordered Delivery</option>
+            <option value="RUDI">RUDI — Reliable Unordered Datagram</option>
+            <option value="UUD">UUD — Unreliable Unordered Delivery</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="inp-nodes">Number of Nodes</label>
+          <div class="range-row">
+            <input type="range" id="inp-nodes" class="form-range" min="2" max="16" value="8" oninput="document.getElementById('lbl-nodes').textContent=this.value"/>
+            <span id="lbl-nodes" class="range-val">8</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="inp-msgsize">Message Size (bytes)</label>
+          <div class="range-row">
+            <input type="range" id="inp-msgsize" class="form-range" min="512" max="67108864" step="512" value="65535" oninput="updateMsgSizeLabel(this.value)"/>
+            <span id="lbl-msgsize" class="range-val">64 KiB</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="inp-rate">Link Rate</label>
+          <select id="inp-rate" class="form-select">
+            <option value="100Gbps">100 Gbps</option>
+            <option value="200Gbps" selected>200 Gbps</option>
+            <option value="400Gbps">400 Gbps</option>
+            <option value="800Gbps">800 Gbps</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="inp-nummsgs">Number of Messages</label>
+          <div class="range-row">
+            <input type="range" id="inp-nummsgs" class="form-range" min="100" max="100000" step="100" value="10000" oninput="document.getElementById('lbl-nummsgs').textContent=parseInt(this.value).toLocaleString()"/>
+            <span id="lbl-nummsgs" class="range-val">10,000</span>
+          </div>
+        </div>
+
+        <button class="btn btn-primary btn-full" id="btn-run-custom" onclick="runCustomSimulation()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          Launch Simulation
+        </button>
+        <button class="btn btn-ghost btn-full" onclick="resetResults()">
+          Reset Output
+        </button>
+      </div>
+
+      <!-- Output terminal -->
+      <div class="sim-output glass-card">
+        <div class="terminal-bar">
+          <div class="terminal-dots">
+            <span class="tdot red"></span>
+            <span class="tdot yellow"></span>
+            <span class="tdot green"></span>
+          </div>
+          <span class="terminal-title">simulation output</span>
+          <div class="terminal-actions">
+            <button class="term-btn" onclick="copyOutput()" title="Copy output">📋</button>
+            <button class="term-btn" onclick="clearOutput()" title="Clear">🗑️</button>
+          </div>
+        </div>
+        <div class="terminal-body" id="sim-output" role="log" aria-live="polite" aria-label="Simulation output">
+          <div class="term-welcome">
+            <div class="term-logo">▶ UET Simulator Ready</div>
+            <div class="term-hint">Select a scenario and click "Launch Simulation" to run.</div>
+            <div class="term-hint">Or click a profile card above to quick-launch a demo.</div>
+          </div>
+        </div>
+        <div class="terminal-footer">
+          <span id="sim-status" class="sim-status idle">● Idle</span>
+          <span id="sim-time" class="sim-time"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════ PACKET INSPECTOR ══════════════════════════════ -->
+<section id="packets" class="section section-dark" aria-labelledby="packets-heading">
+  <div class="section-inner">
+    <div class="section-header">
+      <div class="section-tag">Live Packet Visualization</div>
+      <h2 id="packets-heading" class="section-title">UET Packet Inspector</h2>
+      <p class="section-desc">Explore the exact wire formats of SES and PDS headers per UE-Specification-1.0.2.</p>
+    </div>
+
+    <div class="packet-controls">
+      <button class="pkt-btn active" id="btn-pkt-rud" onclick="showPacket('rud_req')">RUD Request</button>
+      <button class="pkt-btn" id="btn-pkt-rod" onclick="showPacket('rod_req')">ROD Request</button>
+      <button class="pkt-btn" id="btn-pkt-ack" onclick="showPacket('ack')">ACK</button>
+      <button class="pkt-btn" id="btn-pkt-ack-cc" onclick="showPacket('ack_cc')">ACK_CC+SACK</button>
+      <button class="pkt-btn" id="btn-pkt-nack" onclick="showPacket('nack')">NACK</button>
+      <button class="pkt-btn" id="btn-pkt-cp" onclick="showPacket('cp')">Control Pkt</button>
+      <button class="pkt-btn" id="btn-pkt-rudi" onclick="showPacket('rudi')">RUDI</button>
+      <button class="pkt-btn" id="btn-pkt-uud" onclick="showPacket('uud')">UUD</button>
+    </div>
+
+    <div class="packet-display" id="packet-display">
+      <!-- Dynamically populated by JS -->
+    </div>
+
+    <!-- SES Header formats -->
+    <div class="ses-formats">
+      <h3 class="subsection-title">SES Header Formats (§3.4.2)</h3>
+      <div class="ses-grid">
+        <div class="ses-card" onclick="showSesFormat('std_som1')">
+          <div class="ses-bytes">44B</div>
+          <div class="ses-name">STD SOM=1</div>
+          <div class="ses-table">Table 3-8</div>
+        </div>
+        <div class="ses-card" onclick="showSesFormat('std_som0')">
+          <div class="ses-bytes">32B</div>
+          <div class="ses-name">STD SOM=0</div>
+          <div class="ses-table">Table 3-9</div>
+        </div>
+        <div class="ses-card" onclick="showSesFormat('small')">
+          <div class="ses-bytes">20B</div>
+          <div class="ses-name">SMALL</div>
+          <div class="ses-table">Table 3-10</div>
+        </div>
+        <div class="ses-card" onclick="showSesFormat('medium')">
+          <div class="ses-bytes">28B</div>
+          <div class="ses-name">MEDIUM</div>
+          <div class="ses-table">Table 3-14</div>
+        </div>
+        <div class="ses-card" onclick="showSesFormat('response')">
+          <div class="ses-bytes">12B</div>
+          <div class="ses-name">RESPONSE</div>
+          <div class="ses-table">Table 3-11</div>
+        </div>
+        <div class="ses-card" onclick="showSesFormat('resp_data')">
+          <div class="ses-bytes">20B</div>
+          <div class="ses-name">RESP_DATA</div>
+          <div class="ses-table">Table 3-12</div>
+        </div>
+        <div class="ses-card" onclick="showSesFormat('resp_small')">
+          <div class="ses-bytes">12B</div>
+          <div class="ses-name">RESP_SMALL</div>
+          <div class="ses-table">Table 3-13</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════ RESULTS SECTION ═══════════════════════════════ -->
+<section id="results" class="section" aria-labelledby="results-heading">
+  <div class="section-inner">
+    <div class="section-header">
+      <div class="section-tag">Live Analytics</div>
+      <h2 id="results-heading" class="section-title">Simulation Results</h2>
+      <p class="section-desc">Performance metrics from the most recent simulation run.</p>
+    </div>
+
+    <!-- Metric cards -->
+    <div class="metrics-grid" id="metrics-grid">
+      <div class="metric-card" id="metric-throughput">
+        <div class="metric-icon">📶</div>
+        <div class="metric-val" id="m-throughput">--</div>
+        <div class="metric-lbl">Throughput</div>
+        <div class="metric-sub" id="m-throughput-sub">Gbps</div>
+      </div>
+      <div class="metric-card" id="metric-msgs">
+        <div class="metric-icon">📨</div>
+        <div class="metric-val" id="m-msgs">--</div>
+        <div class="metric-lbl">Messages Launched</div>
+        <div class="metric-sub" id="m-msgs-sub">per scenario</div>
+      </div>
+      <div class="metric-card" id="metric-data">
+        <div class="metric-icon">💾</div>
+        <div class="metric-val" id="m-data">--</div>
+        <div class="metric-lbl">Data Transferred</div>
+        <div class="metric-sub" id="m-data-sub">MiB / GiB</div>
+      </div>
+      <div class="metric-card" id="metric-pdcs">
+        <div class="metric-icon">🔗</div>
+        <div class="metric-val" id="m-pdcs">--</div>
+        <div class="metric-lbl">Active PDCs</div>
+        <div class="metric-sub" id="m-pdcs-sub">per node avg</div>
+      </div>
+      <div class="metric-card" id="metric-latency">
+        <div class="metric-icon">⏱</div>
+        <div class="metric-val" id="m-latency">--</div>
+        <div class="metric-lbl">P99 Latency</div>
+        <div class="metric-sub" id="m-latency-sub">nanoseconds</div>
+      </div>
+      <div class="metric-card" id="metric-nacks">
+        <div class="metric-icon">↩️</div>
+        <div class="metric-val" id="m-nacks">--</div>
+        <div class="metric-lbl">NACKs Generated</div>
+        <div class="metric-sub" id="m-nacks-sub">recovery events</div>
+      </div>
+    </div>
+
+    <!-- Delivery mode chart -->
+    <div class="charts-row">
+      <div class="chart-card glass-card">
+        <h3 class="card-title">Delivery Mode Usage</h3>
+        <div class="bar-chart" id="mode-chart">
+          <div class="bar-row">
+            <span class="bar-label">RUD</span>
+            <div class="bar-track"><div class="bar-fill rud" id="bar-rud" style="width:0%"></div></div>
+            <span class="bar-pct" id="pct-rud">0%</span>
+          </div>
+          <div class="bar-row">
+            <span class="bar-label">ROD</span>
+            <div class="bar-track"><div class="bar-fill rod" id="bar-rod" style="width:0%"></div></div>
+            <span class="bar-pct" id="pct-rod">0%</span>
+          </div>
+          <div class="bar-row">
+            <span class="bar-label">RUDI</span>
+            <div class="bar-track"><div class="bar-fill rudi" id="bar-rudi" style="width:0%"></div></div>
+            <span class="bar-pct" id="pct-rudi">0%</span>
+          </div>
+          <div class="bar-row">
+            <span class="bar-label">UUD</span>
+            <div class="bar-track"><div class="bar-fill uud" id="bar-uud" style="width:0%"></div></div>
+            <span class="bar-pct" id="pct-uud">0%</span>
+          </div>
+        </div>
+        <p class="chart-note" id="chart-mode-note">Run a simulation to see mode breakdown.</p>
+      </div>
+
+      <div class="chart-card glass-card">
+        <h3 class="card-title">SES Operation Mix</h3>
+        <div class="donut-chart" id="ses-donut" aria-label="SES operation distribution">
+          <svg viewBox="0 0 120 120" width="120" height="120">
+            <circle id="seg-write" cx="60" cy="60" r="45" fill="none" stroke="#6366f1" stroke-width="18" stroke-dasharray="0 283"/>
+            <circle id="seg-read"  cx="60" cy="60" r="45" fill="none" stroke="#22d3ee" stroke-width="18" stroke-dasharray="0 283"/>
+            <circle id="seg-tagged" cx="60" cy="60" r="45" fill="none" stroke="#f59e0b" stroke-width="18" stroke-dasharray="0 283"/>
+            <circle id="seg-atomic" cx="60" cy="60" r="45" fill="none" stroke="#10b981" stroke-width="18" stroke-dasharray="0 283"/>
+            <text x="60" y="57" text-anchor="middle" fill="#e2e8f0" font-size="10" font-family="Inter">SES</text>
+            <text x="60" y="70" text-anchor="middle" fill="#94a3b8" font-size="8" font-family="Inter">Ops</text>
+          </svg>
+          <div class="donut-legend" id="donut-legend">
+            <div class="dl-item"><span class="dl-dot" style="background:#6366f1"></span>WRITE</div>
+            <div class="dl-item"><span class="dl-dot" style="background:#22d3ee"></span>READ</div>
+            <div class="dl-item"><span class="dl-dot" style="background:#f59e0b"></span>TAGGED</div>
+            <div class="dl-item"><span class="dl-dot" style="background:#10b981"></span>ATOMIC</div>
+          </div>
+        </div>
+        <p class="chart-note" id="chart-ses-note">Run a simulation to see SES operation mix.</p>
+      </div>
+    </div>
+
+    <!-- PDC State Timeline -->
+    <div class="timeline-card glass-card">
+      <h3 class="card-title">PDC State Machine Timeline</h3>
+      <div class="pdc-timeline" id="pdc-timeline" role="img" aria-label="PDC state timeline">
+        <div class="timeline-placeholder">
+          <div class="tl-icon">🔗</div>
+          <div>PDC state transitions will appear here after running a simulation.</div>
+          <div class="tl-hint">Each PDC goes through: CLOSED → CREATING → ESTABLISHED → [QUIESCE] → CLOSE</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════ FOOTER ════════════════════════════════════════ -->
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <div class="logo-badge small">UET</div>
+      <span>Ultra Ethernet Transport Simulator</span>
+    </div>
+    <div class="footer-links">
+      <span>UE-Specification-1.0.2</span>
+      <span>·</span>
+      <span>NS-3 v3.36.1</span>
+      <span>·</span>
+      <span>Alibaba Cloud RDMA Base</span>
+    </div>
+    <div class="footer-spec">
+      Implements: §3.4 SES · §3.5 PDS · §3.5.8 PDC · §2.2 AI/HPC Profiles
+    </div>
+  </div>
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>

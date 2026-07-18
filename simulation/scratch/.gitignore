@@ -1,0 +1,14 @@
+# Ignore everything on scratch by default, except the provided examples
+# and the UET demo / test programs
+/*
+!.gitignore
+!subdir/
+!scratch-simulator.cc
+!CMakeLists.txt
+!uet-ses-pds-demo.cc
+!uet-advanced-demo.cc
+!uet-complete-demo.cc
+!uet-hpc-ai-profiles.cc
+!uet-network-sim.cc
+!uet-phase4-rdma-integration.cc
+!uet-tests.cc

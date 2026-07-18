@@ -1,0 +1,45 @@
+# Build artifacts
+simulation/build/
+simulation/cmake-build*/
+simulation/cmake-cache/
+simulation/_build_test/
+simulation/.lock-ns3*
+simulation/.lock-waf*
+simulation/.waf*
+simulation/testpy-output/
+*.o
+*.a
+*.dylib
+*.so
+*.pyc
+__pycache__/
+
+# Logs and run artifacts
+*.log
+simulation/pdc_state_dump.log
+simulation/core.*
+results/
+
+# OS noise
+.DS_Store
+Thumbs.db
+
+# Editors
+.vscode/
+.idea/
+*.swp
+
+# Copyrighted / course-internal material (kept locally, never committed)
+UE-Specification*.pdf
+Notes/
+Papers_Studying_Studied/
+*.pages
+*.docx
+
+# Interview prep material (local only)
+INTERVIEW_PREP*
+interview_prep*
+
+# Python environments
+venv/
+.venv/
