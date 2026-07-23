@@ -29,16 +29,11 @@ Thumbs.db
 .idea/
 *.swp
 
-# Copyrighted / course-internal material (kept locally, never committed)
-UE-Specification*.pdf
-Notes/
-Papers_Studying_Studied/
+# Personal study material, interview prep, and copyrighted references
+# (kept locally in archive/, never committed)
+archive/
 *.pages
 *.docx
-
-# Interview prep material (local only)
-INTERVIEW_PREP*
-interview_prep*
 
 # Python environments
 venv/
